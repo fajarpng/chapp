@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Icon from 'react-native-vector-icons/FontAwesome5'
 import {
     StyleSheet,
     View,
@@ -22,6 +23,11 @@ export default class Chat extends Component {
       <View style={styles.parent}>
         <View style={styles.header}>
           <TouchableOpacity
+            style={{padding: 5, marginRight: 10}}
+            onPress={() => this.props.navigation.goBack()}>
+            <Icon name='arrow-left' light size={20} color='#fff8e7'/>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={styles.goDetail}
             onPress={() => this.props.navigation.navigate('friendDetail',{data})}>
             <View style={styles.imgWrapper}>
@@ -43,7 +49,9 @@ export default class Chat extends Component {
             placeholder='Type message here ...'
             style={styles.input}
           />
-          <TouchableOpacity style={styles.send}/>
+          <TouchableOpacity style={styles.send}>
+            <Icon name='paper-plane' size={30} color='#fff8e7'/>
+          </TouchableOpacity>
         </View>
       </View>
     )
@@ -58,9 +66,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff8e7'
   },
   header: {
-    width: deviceWidth,
     backgroundColor: '#ff6870',
+    flexDirection: 'row',
     padding: 10,
+    alignItems: 'center',
     elevation: 5,
   },
   goDetail: {
@@ -82,7 +91,9 @@ const styles = StyleSheet.create({
     height: 60,
     width: 60,
     borderRadius: 70,
-    backgroundColor: '#ff6870'
+    backgroundColor: '#ff6870',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   inputWrapper: {
     width: deviceWidth,

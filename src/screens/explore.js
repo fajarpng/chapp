@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Icon from 'react-native-vector-icons/FontAwesome5'
 import {
     StyleSheet,
     View,
@@ -40,7 +41,9 @@ export default class Explore extends Component {
             value='Jessica@mail.com'
             style={styles.input}
           />
-          <TouchableOpacity style={styles.send}/>
+          <TouchableOpacity style={styles.send}>
+            <Icon name='search' size={30} color='#ff6870'/>
+          </TouchableOpacity>
         </View>
         <FlatList
           data={data}
@@ -95,11 +98,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     borderWidth: 2,
     borderRadius: 30,
+    elevation: 3,
     paddingLeft: 10,
   },
   send: {
     height: 60,
     width: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 3,
     borderRadius: 70,
     backgroundColor: '#fff8e7'
   },

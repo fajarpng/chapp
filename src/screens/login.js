@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Icon from 'react-native-vector-icons/FontAwesome5'
 import {
     StyleSheet,
     View,
@@ -12,13 +13,40 @@ import {
     TouchableOpacity
   } from 'react-native';
 
+// import Actoin Redux
+import {connect} from 'react-redux'
+import { login, celarMsg } from '../redux/actions/auth'
+
 import logo from '../assets/chap.png'
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-export default class Login extends Component {
+class Login extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+        email: '',
+        password:'',
+    }
+  }
+  onLogin = () => {
+    const { email, password } = this.state
+    if (email !== '' && password !== ''){
+      this.props.login(this.state)
+    } else {
+      Alert.alert('Please fill all form !')
+    }
+  }
+  componentDidUpdate(){
+  const { errMsg, isErr } = this.props.auth
+  if (errMsg !== '') {
+      isErr ? Alert.alert(errMsg) : Alert.alert(errMsg)
+      this.props.celarMsg()
+    }
+  }
   render (){
+    const { isLoading } = this.props.auth
     return (
       <ScrollView>
       <View style={styles.parent}>
@@ -33,8 +61,14 @@ export default class Login extends Component {
               placeholder='Password'
               secureTextEntry={true}
               style={styles.input} onChangeText={(e) => this.setState({password: e})}/>
-            <TouchableOpacity style={styles.btn} onPress={() => this.props.navigation.navigate('home')}>
-              <Text style={styles.text}>LOGIN</Text>
+            <TouchableOpacity
+              style={styles.btn}
+              onPress={() => this.onLogin()}>
+              {isLoading ? (
+                  <Icon name='spinner' size={30} color='#fff8e7'/>
+                ):(
+                  <Text style={styles.text}>LOGIN</Text>
+                )}
             </TouchableOpacity>
           </View>
           <View style={styles.linkWraper}>
@@ -103,3 +137,10 @@ const styles = StyleSheet.create({
     resizeMode: 'contain'
     }
 })
+
+const mapStateToProps = state => ({
+    auth: state.auth,
+})
+const mapDispatchToProps = { login, celarMsg }
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

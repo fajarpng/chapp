@@ -15,42 +15,54 @@ import {
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
+import c from '../assets/c.jpg'
 
 export default class Detail extends Component {
   render (){
-    const { data } = this.props.route.params
+    const data = {name: 'Tri Fajar', email: 'fajar@mail', img: c}
     return (
-      <>
       <ScrollView>
         <View style={styles.parent}>
           <View style={styles.header}>
             <View style={styles.imgWrapper}>
               <Image style={styles.img} source={data.img}/>
             </View>
-            <Text style={styles.chapp}> {data.name} </Text>
+            <TouchableOpacity
+              style={styles.chat}
+              onPress={() => this.props.navigation.navigate('detail',{data})}>
+              <Icon name='pencil-alt' size={30} color='#fff8e7'/>
+            </TouchableOpacity>
           </View>
           <View style={{padding: 10}}>
             <View style={styles.info}>
+              <View>
+                <Text style={{color: '#ff6870', marginBottom: 10}}>Name</Text>
+                <Text style={{fontSize: 18}}>{data.name}</Text>
+              </View>
+              <Icon name='pencil-alt' size={25} color='#ffabaf'/>
+            </View>
+            <View style={styles.info}>
+              <View>
               <Text style={{color: '#ff6870', marginBottom: 10}}>Status</Text>
               <Text style={{fontSize: 18}}>Hi There im using Chapp !!</Text>
+              </View>
+              <Icon name='pencil-alt' size={25} color='#ffabaf'/>
             </View>
             <View style={styles.info}>
+              <View>
               <Text style={{color: '#ff6870', marginBottom: 10}}>Last location</Text>
               <Text style={{fontSize: 18}}>jl.panglima Kertek, Wonosobo</Text>
+              </View>
             </View>
             <View style={styles.info}>
+              <View>
               <Text style={{color: '#ff6870', marginBottom: 10}}>Email</Text>
               <Text style={{fontSize: 18}}>{data.name}@mail.com</Text>
+              </View>
             </View>
           </View>
         </View>
       </ScrollView>
-      <TouchableOpacity
-          style={styles.chat}
-          onPress={() => this.props.navigation.navigate('detail',{data})}>
-          <Icon name='comments' color='#fff8e7' size={30}/>
-        </TouchableOpacity>
-      </>
     )
   }
 }
@@ -84,14 +96,12 @@ const styles = StyleSheet.create({
     width: undefined,
     resizeMode: 'cover',
   },
-  name: {
-    fontWeight: 'bold',
-    fontSize: 20,
-    marginBottom: 10,
-  },
   info: {
     padding: 20,
     borderBottomColor: '#ff6870',
+    alignItems:'center',
+    justifyContent: 'space-between',
+    flexDirection:'row',
     borderBottomWidth: 2
   },
   chat: {
@@ -103,7 +113,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     bottom: 30,
     right: 30,
-    backgroundColor: '#ff6870',
-    elevation: 3
+    backgroundColor: '#ff6870'
+  },
+  icon: {
+
   },
 })

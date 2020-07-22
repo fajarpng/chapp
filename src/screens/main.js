@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Icon from 'react-native-vector-icons/FontAwesome5'
 import {
     StyleSheet,
     View,
@@ -50,8 +51,16 @@ export default class Main extends Component {
     return (
       <View style={styles.parent}>
         <View style={styles.header}>
-          <Image style={styles.logo} source={logo}/>
-          <Text style={styles.chapp}> Chapp </Text>
+          <View style={styles.rowTop}>
+            <Image style={styles.logo} source={logo}/>
+            <Text style={styles.chapp}> Chapp </Text>
+          </View>
+          
+          <TouchableOpacity
+            style={styles.setting}
+            onPress={()=> this.props.navigation.navigate('setting')}>
+            <Icon name='cog' size={30} color='#fff8e7'/>
+          </TouchableOpacity>
         </View>
         <FlatList
           data={data}
@@ -65,7 +74,9 @@ export default class Main extends Component {
           )}
           keyExtractor={item => item.id.toString()}
           />
-        <TouchableOpacity style={styles.add} onPress={() => this.props.navigation.navigate('explore')}/>
+        <TouchableOpacity style={styles.add} onPress={() => this.props.navigation.navigate('explore')}>
+          <Icon name='user-plus' light size={30} color='#fff8e7'/>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -94,10 +105,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff8e7'
   },
   header: {
-    width: deviceWidth,
     backgroundColor: '#ff6870',
     padding: 10,
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center'
   },
   logo: {
@@ -107,6 +118,13 @@ const styles = StyleSheet.create({
   chapp: {
     fontSize: 25,
     color: '#fff8e7',
+  },
+  rowTop: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  setting: {
+    marginRight: 10,
   },
   row: {
     flexDirection: 'row',
@@ -140,6 +158,8 @@ const styles = StyleSheet.create({
     height: 60,
     width: 60,
     borderRadius: 70,
+    alignItems: 'center',
+    justifyContent: 'center',
     position: 'absolute',
     bottom: 30,
     right: 30,
