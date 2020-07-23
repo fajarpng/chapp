@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Geolocation from '@react-native-community/geolocation';
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import {
     StyleSheet,
@@ -7,7 +8,6 @@ import {
     ScrollView,
     Dimensions,
     Alert,
-    ActivityIndicator,
     Text,
     Image,
     TouchableOpacity
@@ -16,6 +16,7 @@ import {
 // import Actoin Redux
 import { connect } from 'react-redux'
 import { register, celarMsg } from '../redux/actions/auth'
+import { create } from '../redux/actions/user'
 
 import logo from '../assets/chap.png'
 
@@ -28,12 +29,20 @@ class Register extends Component {
     this.state = {
         email: '',
         password:'',
+        username: ''
     }
   }
   onRegis = () => {
-    const { email, password } = this.state
-    if (email !== '' && password !== ''){
-      this.props.register(this.state)
+    const { email, password, username } = this.state
+    if (email !== '' && password !== '' && username !== ''){
+      if (username.replace(/ /g,'').length < 1) {
+        Alert.alert('Username invalid!')
+      } else  {
+        username.length > 20  ? 
+        (Alert.alert('Username maximum 20 character !'))
+        :
+        (this.props.register(this.state), this.props.create(this.state))
+      }
     } else {
       Alert.alert('Please fill all form !')
     }
@@ -46,6 +55,7 @@ class Register extends Component {
     }
   }
   render (){
+    Geolocation.getCurrentPosition(info => this.setState({location: info}));
     const { isLoading } = this.props.auth
     return (
       <ScrollView>
@@ -143,7 +153,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
     auth: state.auth,
+    user: state.user,
 })
-const mapDispatchToProps = { register, celarMsg }
+const mapDispatchToProps = { register, celarMsg, create }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Register)

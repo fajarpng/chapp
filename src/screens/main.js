@@ -1,5 +1,6 @@
-import React, { Component } from 'react'
-import Icon from 'react-native-vector-icons/FontAwesome5'
+import React, { Component } from 'react';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import Geolocation from '@react-native-community/geolocation';
 import {
     StyleSheet,
     View,
@@ -13,6 +14,9 @@ import {
     TouchableOpacity
   } from 'react-native';
 
+// import Actoin Redux
+import { connect } from 'react-redux';
+
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 import s from '../assets/s.jpg'
@@ -20,7 +24,7 @@ import j from '../assets/j.jpg'
 import c from '../assets/c.jpg'
 import logo from '../assets/chap.png'
 
-export default class Main extends Component {
+class Main extends Component {
   constructor(props){
     super(props)
     this.state = {
@@ -75,7 +79,7 @@ export default class Main extends Component {
           keyExtractor={item => item.id.toString()}
           />
         <TouchableOpacity style={styles.add} onPress={() => this.props.navigation.navigate('explore')}>
-          <Icon name='user-plus' light size={30} color='#fff8e7'/>
+          <Icon name='user-plus' light size={20} color='#fff8e7'/>
         </TouchableOpacity>
       </View>
     )
@@ -166,3 +170,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff6870'
   },
 })
+
+export default connect(null)(Main)

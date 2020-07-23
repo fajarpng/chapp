@@ -16,6 +16,7 @@ import {
 // import Actoin Redux
 import {connect} from 'react-redux'
 import { login, celarMsg } from '../redux/actions/auth'
+import { get } from '../redux/actions/user'
 
 import logo from '../assets/chap.png'
 
@@ -34,6 +35,7 @@ class Login extends Component {
     const { email, password } = this.state
     if (email !== '' && password !== ''){
       this.props.login(this.state)
+      this.props.get(this.state)
     } else {
       Alert.alert('Please fill all form !')
     }
@@ -141,6 +143,6 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
     auth: state.auth,
 })
-const mapDispatchToProps = { login, celarMsg }
+const mapDispatchToProps = { login, celarMsg, get }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login)
