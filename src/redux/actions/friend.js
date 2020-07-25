@@ -10,10 +10,16 @@ const search = (data)=>{
       .get()
   }
 }
+const friendList = (data) => {
+  return {
+    type: 'SEARCH',
+    payload: data
+  }
+}
 const clear = ()=>{
   return {
     type: 'CLEAR',
   }
 }
 
-export { search, clear }
+export { search, friendList, clear }

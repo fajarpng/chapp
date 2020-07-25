@@ -26,7 +26,8 @@ class Chat extends Component {
     super(props);
     this.state = {
       chats: [],
-      message: ''
+      message: '',
+      friend: ''
     };
   }
 
@@ -37,9 +38,7 @@ class Chat extends Component {
     .ref(`/users/${uid}/${data.uid}`)
     .on('value', 
       snapshot => {
-        snapshot.val() !== null && this.setState({chats: snapshot.val().chats}),
-        console.log(snapshot.val()),
-        console.log(`/users/${uid}/${data.uid}`)
+        // snapshot.val() !== null && this.setState({chats: snapshot.val().chats}),
     })
   }
 
@@ -48,24 +47,23 @@ class Chat extends Component {
     const { uid } = this.props.user.dataUser
     const { data } = this.props.route.params
 
-    database()
-      .ref(`/users/${uid}/${data.uid}`)
-      .set({
-        chats
-      })
-    database()
-      .ref(`/users/${data.uid}/${uid}`)
-      .set({
-        chats
-      }).then(
+    const sender = database().ref(`/users/${uid}/${data.uid}`);
+    const recever = database().ref(`/users/${data.uid}/${uid}`);
+
+    // send chat
+    sender.set({ chats })
+    recever.set({ chats }).then(
       this.setState({message: ''}),
-      this.readMessage())
+      this.readMessage()
+      )
+    // notive
   }
 
   // send
   onSend = () => {
     const { uid } = this.props.user.dataUser
     const { message, chats } = this.state
+
     if (message.replace(/ /g,'').length > 0) {
       const sended = [...chats, {message, uid}]
       this.sendMessage(sended)
@@ -84,6 +82,7 @@ class Chat extends Component {
     return (
       <View style={styles.parent}>
         <View style={styles.header}>
+          <View style={{alignItems: 'center', flexDirection: 'row' }}>
           <TouchableOpacity
             style={{padding: 5, marginRight: 10}}
             onPress={() => this.props.navigation.goBack()}>
@@ -103,29 +102,35 @@ class Chat extends Component {
             <Text style={styles.chapp}>{username}</Text>
           </TouchableOpacity>
         </View>
-        <FlatList
-          style={ { padding: 10 } }
-          data={ chats }
-          renderItem={({item}) => (
-            <Item
-              data = { item }
-              frnId = { uid }
-            />
-          )}
-          keyExtractor={item => item.message}
-        />
-        <View style={styles.inputWrapper}>
-          <TextInput
-            placeholder='Type message here ...'
-            value={this.state.message}
-            style={styles.input}
-            onChangeText={ e => this.setState({message: e}) }
+        <TouchableOpacity
+          style={{padding: 5}}
+          onPress={()=>this.props.navigation.navigate('shareLoc', {data})}>
+          <Icon name='map-marked-alt' size={35} color='#fff8e7'/>
+        </TouchableOpacity>
+      </View>
+      <FlatList
+        style={ { padding: 10 } }
+        data={ chats }
+        renderItem={({item}) => (
+          <Item
+            data = { item }
+            frnId = { uid }
           />
-          <TouchableOpacity
-            style={styles.send}
-            onPress={this.onSend}>
-            <Icon name='paper-plane' size={30} color='#fff8e7'/>
-          </TouchableOpacity>
+        )}
+        keyExtractor={item => item.message}
+      />
+      <View style={styles.inputWrapper}>
+        <TextInput
+          placeholder='Type message here ...'
+          value={this.state.message}
+          style={styles.input}
+          onChangeText={ e => this.setState({message: e}) }
+        />
+        <TouchableOpacity
+          style={styles.send}
+          onPress={this.onSend}>
+          <Icon name='paper-plane' size={30} color='#fff8e7'/>
+        </TouchableOpacity>
         </View>
       </View>
     )
@@ -134,7 +139,6 @@ class Chat extends Component {
 class Item extends Component {
   render (){
     const { data, frnId } = this.props
-    console.log(data.uid !== frnId ? data.uid:frnId)
     return (
       <>
       {data.uid !== undefined && data.uid !== frnId ? (
@@ -163,6 +167,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     alignItems: 'center',
+    justifyContent: 'space-between',
     elevation: 5,
   },
   goDetail: {
@@ -170,7 +175,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   chapp: {
-    fontSize: 25,
+    fontSize: 20,
     color: '#fff8e7',
   },
   input: {
