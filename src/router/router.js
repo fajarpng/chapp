@@ -9,7 +9,7 @@ import Landing from '../screens/landing';
 import Login from '../screens/login';
 import Register from '../screens/register';
 import Home from '../screens/main';
-import Detail from '../screens/detail';
+import Chat from '../screens/detail';
 import Friend from '../screens/userDetail';
 import Setting from '../screens/profile';
 import Explore from '../screens/explore';
@@ -29,8 +29,8 @@ class Route extends Component {
 	        		name={'home'}/>
 	        	<Stack.Screen 
 	        		options={{headerShown: false}}
-	        		component={Detail} 
-	        		name={'detail'}/>
+	        		component={Chat} 
+	        		name={'chat'}/>
 	        	<Stack.Screen 
 	        		options={{
 			          title: ' ',

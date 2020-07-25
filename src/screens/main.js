@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Geolocation from '@react-native-community/geolocation';
+import database from '@react-native-firebase/database';
+// import Geolocation from '@react-native-community/geolocation';
 import {
     StyleSheet,
     View,
@@ -20,56 +21,26 @@ import { update } from '../redux/actions/user';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
-import s from '../assets/s.jpg'
-import j from '../assets/j.jpg'
-import c from '../assets/c.jpg'
+
 import logo from '../assets/chap.png'
 
 class Main extends Component {
   constructor(props){
     super(props)
-    const { dataUser } = this.props.user
     this.state = {
-      data: [
-        {
-          id: 1,
-          name: 'Cacha',
-          img: c,
-          msg: 'Hi do you remember me ? :)'
-        },
-        {
-          id: 2,
-          name: 'Jessica',
-          img: j,
-          msg: 'Chapp is my favorite app'
-        },
-        {
-          id: 3,
-          name: 'Steven Chow',
-          img: s,
-          msg: 'Yo! have a nice day'
-        }
-      ],
-      location: dataUser.location,
+      data: []
     }
   }
 
-  // update locaion
-  updateLoc = () => {
-    Geolocation.getCurrentPosition(info => this.setState({location: info}))
-    this.update()
+  firendList = () => {
+    const { uid } = this.props.auth
   }
-
-  //  update profile
-  update = () => {
-    const { dataUser } = this.props.user
-    const { location } = this.state
-    this.props.update(dataUser, location)
+  componentDidMount(){
+    this.firendList()
   }
-
   componentDidUpdate(){
     // this.updateLoc()
-    console.log('update')
+    // console.log('update')
   }
 
   render (){
@@ -193,7 +164,7 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state => ({
-    user: state.user,
+    auth: state.auth,
 })
 const mapDispatchToProps = { update }
 export default connect(mapStateToProps, mapDispatchToProps)(Main)

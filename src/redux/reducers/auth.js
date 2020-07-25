@@ -1,6 +1,7 @@
 const initialState = {
     isLogedin: false,
     isLoading: false,
+    uid: '',
     errMsg: '',
     isErr: false,
   }
@@ -27,6 +28,7 @@ const initialState = {
           isLoading: false,
           isErr: false,
           errMsg: 'Success, welcome !',
+          uid: action.payload.user.uid,
           isLogedin: true
         }
       }
@@ -49,7 +51,8 @@ const initialState = {
           ...state,
           isLoading: false,
           isErr: false,
-          errMsg: 'Success, you have to login !'
+          errMsg: 'Success, you have to login !',
+          uid: action.payload.user.uid,
         }
       }
       case 'LOGOUT_PENDING': {

@@ -50,6 +50,7 @@ const user = (state=initialState, action) => {
         ...state,
         loadingUser: false,
         errUser: false,
+        errMsgUser: 'Success!',
         dataUser: action.payload._data,
       }
     }

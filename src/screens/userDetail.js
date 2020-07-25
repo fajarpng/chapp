@@ -57,7 +57,7 @@ class Detail extends Component {
               style={styles.info}
               onPress={()=>this.props.navigation.navigate('map',{data: dataSearch})}>
               <Text style={{color: '#ff6870', marginBottom: 10}}>Last location</Text>
-              <Text style={{fontSize: 18}}>jl.panglima Kertek, Wonosobo</Text>
+              <Text style={{fontSize: 18}}>Tap to open the map. </Text>
             </TouchableOpacity>
             <View style={styles.info}>
               <Text style={{color: '#ff6870', marginBottom: 10}}>Email</Text>
@@ -68,7 +68,7 @@ class Detail extends Component {
       </ScrollView>
       <TouchableOpacity
           style={styles.chat}
-          onPress={() => this.props.navigation.navigate('detail',{data})}>
+          onPress={() => this.props.navigation.navigate('chat',{data : dataSearch})}>
           <Icon name='comments' color='#fff8e7' size={30}/>
         </TouchableOpacity>
       </>

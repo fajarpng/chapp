@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome5'
+import database from '@react-native-firebase/database';
 import {
     StyleSheet,
     View,
@@ -13,12 +14,73 @@ import {
     TouchableOpacity
   } from 'react-native';
 
+// import Actoin Redux
+import { connect } from 'react-redux';
+import { update } from '../redux/actions/user';
+
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-export default class Chat extends Component {
+class Chat extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      chats: [],
+      message: ''
+    };
+  }
+
+  readMessage = () =>{
+    const { uid } = this.props.user.dataUser
+    const { data } = this.props.route.params
+    database()
+    .ref(`/users/${uid}/${data.uid}`)
+    .on('value', 
+      snapshot => {
+        snapshot.val() !== null && this.setState({chats: snapshot.val().chats}),
+        console.log(snapshot.val()),
+        console.log(`/users/${uid}/${data.uid}`)
+    })
+  }
+
+  // send to database
+  sendMessage = (chats) => {
+    const { uid } = this.props.user.dataUser
+    const { data } = this.props.route.params
+
+    database()
+      .ref(`/users/${uid}/${data.uid}`)
+      .set({
+        chats
+      })
+    database()
+      .ref(`/users/${data.uid}/${uid}`)
+      .set({
+        chats
+      }).then(
+      this.setState({message: ''}),
+      this.readMessage())
+  }
+
+  // send
+  onSend = () => {
+    const { uid } = this.props.user.dataUser
+    const { message, chats } = this.state
+    if (message.replace(/ /g,'').length > 0) {
+      const sended = [...chats, {message, uid}]
+      this.sendMessage(sended)
+    } else { this.setState({message: ''})}
+  }
+
+  componentDidMount(){
+    this.readMessage()
+  }
+
   render (){
     const { data } = this.props.route.params
+    const { image, username, uid } = data
+    const { chats } = this.state
+
     return (
       <View style={styles.parent}>
         <View style={styles.header}>
@@ -31,29 +93,60 @@ export default class Chat extends Component {
             style={styles.goDetail}
             onPress={() => this.props.navigation.navigate('friendDetail',{data})}>
             <View style={styles.imgWrapper}>
-              <Image style={styles.img} source={data.img}/>
+            { image !== null && image.length > 0  ? (
+                <Image style={styles.img} source={{uri: image}}/>
+              ):(
+                <Icon name='user-alt' size={20} color='#fff8e7' style={{alignSelf: 'center'}}/>
+              )
+            }
             </View>
-            <Text style={styles.chapp}> {data.name} </Text>
+            <Text style={styles.chapp}>{username}</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView style={{padding: 10}}>
-          <View style={styles.myMsg}>
-            <Text style={{fontSize: 15, color: '#fff8e7'}}>Hi ! {data.name}</Text>
-          </View>
-          <View style={styles.frnMsg}>
-            <Text style={{fontSize: 15}}>{data.msg}</Text>
-          </View>
-        </ScrollView>
+        <FlatList
+          style={ { padding: 10 } }
+          data={ chats }
+          renderItem={({item}) => (
+            <Item
+              data = { item }
+              frnId = { uid }
+            />
+          )}
+          keyExtractor={item => item.message}
+        />
         <View style={styles.inputWrapper}>
           <TextInput
             placeholder='Type message here ...'
+            value={this.state.message}
             style={styles.input}
+            onChangeText={ e => this.setState({message: e}) }
           />
-          <TouchableOpacity style={styles.send}>
+          <TouchableOpacity
+            style={styles.send}
+            onPress={this.onSend}>
             <Icon name='paper-plane' size={30} color='#fff8e7'/>
           </TouchableOpacity>
         </View>
       </View>
+    )
+  }
+}
+class Item extends Component {
+  render (){
+    const { data, frnId } = this.props
+    console.log(data.uid !== frnId ? data.uid:frnId)
+    return (
+      <>
+      {data.uid !== undefined && data.uid !== frnId ? (
+        <View style={styles.myMsg}>
+          <Text style={{fontSize: 15, color: '#fff8e7'}}>{data.message}</Text>
+        </View>
+        ):(
+        <View style={styles.frnMsg}>
+          <Text style={{fontSize: 15}}>{data.message}</Text>
+        </View>
+        )}
+      </>
     )
   }
 }
@@ -112,6 +205,8 @@ const styles = StyleSheet.create({
   imgWrapper: {
     height: 50,
     width: 50,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,.3)',
     borderRadius: 70,
     marginRight: 5
   },
@@ -147,3 +242,9 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
 })
+
+const mapStateToProps = state => ({
+    user: state.user,
+})
+const mapDispatchToProps = { update }
+export default connect(mapStateToProps, mapDispatchToProps)(Chat)

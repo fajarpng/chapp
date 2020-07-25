@@ -46,7 +46,13 @@ class Explore extends Component {
   }
 
   onSearch = () => {
-    this.props.search(this.state)
+    const {email} = this.state
+    const {dataUser} = this.props.user
+    email.toLowerCase() !== dataUser.email ? (
+        this.props.search(this.state)
+      ):(
+        ToastAndroid.show('No user found !', ToastAndroid.SHORT)
+      )
   }
 
   render (){
@@ -184,6 +190,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
     friend: state.friend,
+    user: state.user
 })
 const mapDispatchToProps = { search, clear }
 

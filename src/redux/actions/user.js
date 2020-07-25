@@ -2,7 +2,7 @@ import firestore from '@react-native-firebase/firestore'
 import storage from '@react-native-firebase/storage';
 
 const create = (data)=>{
-  const{ email, username, location } = data
+  const{ email, username, location, uid } = data
   return {
     type: 'CREATE',
     payload: firestore()
@@ -13,6 +13,7 @@ const create = (data)=>{
         username,
         status: 'Hi! there im using Chapp',
         image: null,
+        uid,
         location
       })
   }
@@ -28,7 +29,7 @@ const get = (data)=>{
   }
 }
 const update = (data, location)=>{
-  const {email, username, status, image} = data
+  const {email, username, status, image, uid} = data
   return {
     type: 'CREATE',
     payload: firestore()
@@ -39,6 +40,7 @@ const update = (data, location)=>{
         username,
         status,
         image,
+        uid,
         location
     })
   }

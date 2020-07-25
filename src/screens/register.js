@@ -27,6 +27,7 @@ class Register extends Component {
   constructor(props){
     super(props)
     this.state = {
+        uid: '',
         email: '',
         password:'',
         username: ''
@@ -41,17 +42,29 @@ class Register extends Component {
         username.length > 20  ? 
         (Alert.alert('Username maximum 20 character !'))
         :
-        (this.props.register(this.state), this.props.create(this.state))
+        (this.props.register(this.state))
       }
     } else {
       Alert.alert('Please fill all form !')
     }
   }
+
+  onCreate = () => {
+    const { email, uid, username } = this.state
+    if (email !== '' && uid !== '' && username !== ''){
+      this.props.create(this.state)
+    }
+  }
+
   componentDidUpdate(){
-  const { errMsg, isErr } = this.props.auth
-  if (errMsg !== '') {
-      isErr ? Alert.alert(errMsg) : Alert.alert(errMsg)
-      this.props.celarMsg()
+    const { errMsg, isErr, uid } = this.props.auth
+    if (errMsg !== '') {
+        isErr ? Alert.alert(errMsg) : (this.setState({uid}), Alert.alert(errMsg))
+        this.props.celarMsg()
+    }
+    if (this.state.uid !== ''){
+      this.onCreate()
+      this.setState({uid: ''})
     }
   }
   render (){

@@ -35,6 +35,7 @@ class Profile extends Component {
     const { dataUser } = this.props.user
     this.state = {
       username : dataUser.username,
+      uid: dataUser.uid,
       email: dataUser.email,
       status: dataUser.status,
       image: dataUser.image,
