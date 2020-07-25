@@ -27,8 +27,8 @@ const get = (data)=>{
       .get()
   }
 }
-const update = (data)=>{
-  const {email, username, status, imageName} = data
+const update = (data, location)=>{
+  const {email, username, status, image} = data
   return {
     type: 'CREATE',
     payload: firestore()
@@ -38,7 +38,8 @@ const update = (data)=>{
         email: email.toLowerCase(),
         username,
         status,
-        image: imageName
+        image,
+        location
     })
   }
 }

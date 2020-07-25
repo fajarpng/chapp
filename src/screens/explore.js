@@ -1,5 +1,6 @@
-import React, { Component } from 'react'
-import Icon from 'react-native-vector-icons/FontAwesome5'
+import React, { Component } from 'react';
+import storage from '@react-native-firebase/storage';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import {
     StyleSheet,
     View,
@@ -10,70 +11,96 @@ import {
     FlatList,
     Text,
     Image,
+    ToastAndroid,
     TouchableOpacity
   } from 'react-native';
+
+// import Actoin Redux
+import {connect} from 'react-redux'
+import { search, clear } from '../redux/actions/friend'
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 import j from '../assets/j.jpg'
 
-export default class Explore extends Component {
+class Explore extends Component {
   constructor(props){
     super(props)
     this.state = {
-      data: [
-        {
-          id: 2,
-          name: 'Jessica',
-          img: j,
-          msg: 'Chapp is my favorite app'
-        },
-      ]
+      email: '',
+      data: []
     }
   }
+
+  componentDidUpdate(){
+  const { errMsgSearch, errSearch, dataSearch } = this.props.friend
+  if (errMsgSearch !== '') {
+      errSearch && ToastAndroid.show(errMsgSearch, ToastAndroid.SHORT)
+      dataSearch === undefined ? (
+        ToastAndroid.show('No user found !', ToastAndroid.SHORT)
+        ):(
+        this.setState({data: [dataSearch]})
+        ) 
+      this.props.clear()
+    }
+  }
+
+  onSearch = () => {
+    this.props.search(this.state)
+  }
+
   render (){
     const { data } = this.state
+    const { dataSearch } = this.props.friend
     return (
       <View style={styles.parent}>
         <View style={styles.inputWrapper}>
           <TextInput
             placeholder='Search user by email ...'
-            value='Jessica@mail.com'
             style={styles.input}
+            onChangeText={(e) => this.setState({email: e})}
           />
-          <TouchableOpacity style={styles.send}>
-            <Icon name='search' size={30} color='#ff6870'/>
+          <TouchableOpacity
+            style={styles.send}
+            onPress={this.onSearch}>
+            <Icon name='search' size={20} color='#ff6870'/>
           </TouchableOpacity>
         </View>
         <FlatList
           data={data}
           renderItem={({item}) => (
             <TouchableOpacity
-              onPress={() => this.props.navigation.navigate('friendDetail',{data: item})} >
+              onPress={() => this.props.navigation.navigate('friendDetail',{data: dataSearch})} >
               <Item
                 data ={item}
               />
             </TouchableOpacity>
           )}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item => item.email}
           />
       </View>
     )
   }
 }
+
 class Item extends Component {
   render (){
     const {data} = this.props
     return (
       <View style={styles.row}>
       <View style={styles.imgWrapper}>
-        <Image style={styles.img} source={data.img}/>
+      {data.image !== null && data.image.length > 0 ? (
+        <Image style={styles.img} source={{uri: data.image}}/>
+        ):(
+        <Icon name='user-alt' color='#fff8e7' size={20} style={{alignSelf: 'center'}}/>
+        )}
       </View>
-      <Text style={styles.name}> {data.name} </Text>
+      <Text style={styles.name}> {data.username} </Text>
       </View>
     )
   }
 }
+
 const styles = StyleSheet.create({
   parent: {
     flex: 1,
@@ -128,6 +155,8 @@ const styles = StyleSheet.create({
     height: 60,
     width: 60,
     borderRadius: 70,
+    backgroundColor: 'rgba(0,0,0,.3)',
+    justifyContent: 'center',
     marginRight: 5
   },
   img: {
@@ -152,3 +181,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff6870'
   },
 })
+
+const mapStateToProps = state => ({
+    friend: state.friend,
+})
+const mapDispatchToProps = { search, clear }
+
+export default connect(mapStateToProps, mapDispatchToProps)(Explore)

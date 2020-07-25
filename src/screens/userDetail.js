@@ -13,34 +13,55 @@ import {
     TouchableOpacity
   } from 'react-native';
 
+// import Actoin Redux
+import {connect} from 'react-redux'
+import { search } from '../redux/actions/friend'
+
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-export default class Detail extends Component {
+class Detail extends Component {
+
+  componentDidMount(){
+    // const { data } = this.props.route.params
+  }
+
   render (){
-    const { data } = this.props.route.params
+    const { dataSearch } = this.props.friend
+    const { image, username, email, location, status } = dataSearch
+
     return (
       <>
       <ScrollView>
         <View style={styles.parent}>
           <View style={styles.header}>
             <View style={styles.imgWrapper}>
-              <Image style={styles.img} source={data.img}/>
+            { image !== null && image.length > 0  ? (
+                <Image style={styles.img} source={{uri: image}}/>
+              ):(
+                <Icon name='user-alt' size={100} style={styles.icon}/>
+              )
+            }
             </View>
-            <Text style={styles.chapp}> {data.name} </Text>
           </View>
           <View style={{padding: 10}}>
             <View style={styles.info}>
-              <Text style={{color: '#ff6870', marginBottom: 10}}>Status</Text>
-              <Text style={{fontSize: 18}}>Hi There im using Chapp !!</Text>
+              <Text style={{color: '#ff6870', marginBottom: 10}}>Username</Text>
+              <Text style={{fontSize: 18}}>{username}</Text>
             </View>
             <View style={styles.info}>
+              <Text style={{color: '#ff6870', marginBottom: 10}}>Status</Text>
+              <Text style={{fontSize: 18}}>{status}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.info}
+              onPress={()=>this.props.navigation.navigate('map',{data: dataSearch})}>
               <Text style={{color: '#ff6870', marginBottom: 10}}>Last location</Text>
               <Text style={{fontSize: 18}}>jl.panglima Kertek, Wonosobo</Text>
-            </View>
+            </TouchableOpacity>
             <View style={styles.info}>
               <Text style={{color: '#ff6870', marginBottom: 10}}>Email</Text>
-              <Text style={{fontSize: 18}}>{data.name}@mail.com</Text>
+              <Text style={{fontSize: 18}}>{email}</Text>
             </View>
           </View>
         </View>
@@ -77,12 +98,18 @@ const styles = StyleSheet.create({
   imgWrapper: {
     height: deviceHeight - 400,
     width: deviceWidth,
+    backgroundColor: 'rgba(0,0,0,.5)',
+    justifyContent:'center'
   },
   img: {
     flex:1,
     height: undefined,
     width: undefined,
     resizeMode: 'cover',
+  },
+  icon: {
+    alignSelf: 'center',
+    color: '#fff8e7',
   },
   name: {
     fontWeight: 'bold',
@@ -107,3 +134,10 @@ const styles = StyleSheet.create({
     elevation: 3
   },
 })
+
+const mapStateToProps = state => ({
+    friend: state.friend,
+})
+const mapDispatchToProps = { search }
+
+export default connect(mapStateToProps, mapDispatchToProps)(Detail)

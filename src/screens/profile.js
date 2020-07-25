@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import storage from '@react-native-firebase/storage';
+import Geolocation from '@react-native-community/geolocation';
 import {
     StyleSheet,
     View,
@@ -27,16 +28,17 @@ import { update, get, clear, uploadImage } from '../redux/actions/user'
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
-import c from '../assets/c.jpg'
 
 class Profile extends Component {
   constructor(props){
     super(props)
+    const { dataUser } = this.props.user
     this.state = {
-      username : this.props.user.dataUser.username,
-      email: this.props.user.dataUser.email,
-      status: this.props.user.dataUser.status,
-      image: this.props.user.dataUser.image,
+      username : dataUser.username,
+      email: dataUser.email,
+      status: dataUser.status,
+      image: dataUser.image,
+      location: dataUser.location,
       editStatus: false,
       editName: false,
       imageName: ''
@@ -47,6 +49,7 @@ class Profile extends Component {
   chooseImage = () => {
     let options = {
       title: 'Select Image',
+      customButtons: [{ name: 'removeImage', title: 'Remove Photo Profile' }],
       storageOptions: {
         skipBackup: true,
         path: 'images',
@@ -58,7 +61,7 @@ class Profile extends Component {
       } else if (response.error) {
         ToastAndroid.show('Something wrong, try again', ToastAndroid.SHORT);
       } else if (response.customButton) {
-        ToastAndroid.show('Something wrong, try again', ToastAndroid.SHORT);
+        this.removeImage();
       } else if (response.fileSize >= 2077116) {
         ToastAndroid.show('Max Size 2 Mb', ToastAndroid.SHORT);
       } else {
@@ -79,13 +82,18 @@ class Profile extends Component {
   // upload image
   onUpload = () => {
     this.props.uploadImage(this.state)
+    this.downloadUrl()
+  }
+
+  // remove photo profile
+  removeImage = () =>{
+    this.setState({image: null})
     this.onUpdate()
   }
 
-
   // edit
   onUpdate = () => {
-    const { username } = this.state
+    const { username, location } = this.state
     if (username.replace(/ /g,'').length < 1) {
       Alert.alert('Username invalid!')
     } else  {
@@ -94,23 +102,25 @@ class Profile extends Component {
       :
       (
         this.setState({editName: false, editStatus: false}),
-        this.props.update(this.state)
+        this.props.update(this.state, location)
       )
     }
   }
 
   // Get image from storage
-  downloadUrl = () => {
-    const { image } = this.props.user.dataUser
-    if (image !== null) {
-      storage().ref(image).getDownloadURL().then((url) => {
+  downloadUrl = async () => {
+    const { imageName } = this.state
+    if (imageName !== null && imageName.length > 0 ) {
+      await storage().ref(imageName).getDownloadURL().then((url) => {
           this.setState({image: url})
+          this.onUpdate()
         })
     }
   }
 
   componentDidMount(){
-    this.downloadUrl()
+    this.props.get(this.state)
+    Geolocation.getCurrentPosition(info => this.setState({location: info}))
   }
 
   componentDidUpdate(){
@@ -125,7 +135,7 @@ class Profile extends Component {
         Alert.alert(errMsg)
       ):(
         this.props.get(this.state),
-        this.downloadUrl()
+        ToastAndroid.show('Profile Updated', ToastAndroid.SHORT)
       )
       this.props.clear()
     }
@@ -134,17 +144,16 @@ class Profile extends Component {
   render (){
     const { isLoading } = this.props.auth
     const { dataUser } = this.props.user
-    const { image } = this.state
 
     return (
       <View style={styles.parent}>
         <ScrollView>
           <View style={styles.header}>
             <View style={styles.imgWrapper}>
-              { dataUser.image !== null ? (
-                <Image style={styles.img} source={{uri: image}}/>
+              { dataUser.image !== null && dataUser.image.length > 0  ? (
+                <Image style={styles.img} source={{uri: dataUser.image}}/>
                 ):(
-                <Icon name='user-alt' size={100} color='#fff8e7'/>
+                <Icon name='user-alt' size={100} style={styles.icon}/>
                 )
               }
             </View>
@@ -156,30 +165,31 @@ class Profile extends Component {
           </View>
           <View style={{padding: 10}}>
             <View style={styles.info}>
-              <View>
+              <View style={styles.row}>
                 <Text style={{color: '#ff6870', marginBottom: 10}}>Username</Text>
-                <Text style={{fontSize: 18}}>{dataUser.username}</Text>
+                <TouchableOpacity
+                  onPress={() => this.setState({ editName : true })}>
+                  <Icon name='pencil-alt' size={20} color='#ffabaf'/>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                onPress={() => this.setState({ editName : true })}>
-                <Icon name='pencil-alt' size={20} color='#ffabaf'/>
-              </TouchableOpacity>
+              <Text style={{fontSize: 18}}>{dataUser.username}</Text>
             </View>
             <View style={styles.info}>
-              <View>
-              <Text style={{color: '#ff6870', marginBottom: 10}}>Status</Text>
+              <View style={styles.row}>
+                <Text style={{color: '#ff6870', marginBottom: 10}}>Status</Text>
+                <TouchableOpacity
+                  onPress={() => this.setState({ editStatus : true })}>
+                  <Icon name='pencil-alt' size={20} color={'#ffabaf'}/>
+                </TouchableOpacity>
+              </View>
               <Text style={{fontSize: 18}}>{dataUser.status}</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => this.setState({ editStatus : true })}>
-                <Icon name='pencil-alt' size={20} color='#ffabaf'/>
-              </TouchableOpacity>
             </View>
             <View style={styles.info}>
-              <View>
+              <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('map',{data: dataUser})}>
               <Text style={{color: '#ff6870', marginBottom: 10}}>Last location</Text>
               <Text style={{fontSize: 18}}>jl.panglima Kertek, Wonosobo</Text>
-              </View>
+              </TouchableOpacity>
             </View>
             <View style={styles.info}>
               <View>
@@ -285,8 +295,7 @@ const styles = StyleSheet.create({
     height: deviceHeight - 400,
     width: deviceWidth,
     backgroundColor: 'rgba(0,0,0,.5)',
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent:'center'
   },
   img: {
     flex:1,
@@ -294,13 +303,19 @@ const styles = StyleSheet.create({
     width: undefined,
     resizeMode: 'cover',
   },
+  icon: {
+    alignSelf: 'center',
+    color: '#fff8e7',
+  },
   info: {
     padding: 20,
     borderBottomColor: '#ff6870',
-    alignItems:'center',
-    justifyContent: 'space-between',
-    flexDirection:'row',
     borderBottomWidth: 2
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   chat: {
     height: 60,

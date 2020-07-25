@@ -16,6 +16,7 @@ import {
 
 // import Actoin Redux
 import { connect } from 'react-redux';
+import { update } from '../redux/actions/user';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -27,6 +28,7 @@ import logo from '../assets/chap.png'
 class Main extends Component {
   constructor(props){
     super(props)
+    const { dataUser } = this.props.user
     this.state = {
       data: [
         {
@@ -47,9 +49,29 @@ class Main extends Component {
           img: s,
           msg: 'Yo! have a nice day'
         }
-      ]
+      ],
+      location: dataUser.location,
     }
   }
+
+  // update locaion
+  updateLoc = () => {
+    Geolocation.getCurrentPosition(info => this.setState({location: info}))
+    this.update()
+  }
+
+  //  update profile
+  update = () => {
+    const { dataUser } = this.props.user
+    const { location } = this.state
+    this.props.update(dataUser, location)
+  }
+
+  componentDidUpdate(){
+    // this.updateLoc()
+    console.log('update')
+  }
+
   render (){
     const { data } = this.state
     return (
@@ -59,7 +81,6 @@ class Main extends Component {
             <Image style={styles.logo} source={logo}/>
             <Text style={styles.chapp}> Chapp </Text>
           </View>
-          
           <TouchableOpacity
             style={styles.setting}
             onPress={()=> this.props.navigation.navigate('setting')}>
@@ -171,4 +192,8 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect(null)(Main)
+const mapStateToProps = state => ({
+    user: state.user,
+})
+const mapDispatchToProps = { update }
+export default connect(mapStateToProps, mapDispatchToProps)(Main)

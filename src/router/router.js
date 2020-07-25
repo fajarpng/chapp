@@ -13,6 +13,7 @@ import Detail from '../screens/detail';
 import Friend from '../screens/userDetail';
 import Setting from '../screens/profile';
 import Explore from '../screens/explore';
+import Map from '../screens/maps/map';
 // import Tab from '../screens/botNavbar'
 
 class Route extends Component {
@@ -34,10 +35,7 @@ class Route extends Component {
 	        		options={{
 			          title: ' ',
 			          headerTransparent: true,
-			          headerTintColor: '#fff8e7',
-			          headerTitleStyle: {
-			            fontWeight: 'bold',
-			          },
+			          headerTintColor: '#ff6870',
 			        }}
 	        		component={Friend} 
 	        		name={'friendDetail'}/>
@@ -63,6 +61,18 @@ class Route extends Component {
 			        }}
 	        		component={Setting} 
 	        		name={'setting'}/>
+	        	<Stack.Screen
+	        		options={{
+			          title: ' ',
+			          title: 'Map view',
+			          headerStyle: {
+			          	backgroundColor: '#fff8e7',
+			          	elevation: 3
+			          },
+			          headerTintColor: '#ff6870',
+			        }}
+	        		component={Map}
+	        		name={'map'}/>
 	        	</>):(<>
 	        	<Stack.Screen options={{headerShown: false}} component={Landing} name={'landing'}/>
 	        	<Stack.Screen 
